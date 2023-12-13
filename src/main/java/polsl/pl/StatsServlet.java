@@ -4,6 +4,8 @@
  */
 package polsl.pl;
 
+import polsl.pl.model.InvalidCharException;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,6 +16,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
+ * Shows the user some stats of usage in the site
+ * 
+ * <br>
+ * <ul>
+ *      <li>Last visit. Last time they performed an operation with the cipher</li>
+ *      <li>Number of errors. Number of times an invalid character was introduced in the cipher</li>
+ *      <li>Number of operations. Number of times the user has performed an operation with the cipher. Either encoding or decoding.</li>
+ * </ul>
+ * 
+ * @see InvalidCharException
  *
  * @author luiz
  * @version 1.0
@@ -41,16 +53,14 @@ public class StatsServlet extends HttpServlet {
             int actions = 0;
             
             for(Cookie cookie : cookies) {
-                switch (cookie.getName()) {
-                    case "lastVisit" -> {
-                        lastVisit = cookie.getValue();
-                    }
-                    case "errors" -> {
-                        errors = Integer.parseInt(cookie.getValue());
-                    }
-                    case "numTextActions" -> {
-                        actions = Integer.parseInt(cookie.getValue());
-                    }
+                String name = cookie.getName();
+                
+                if (name.equals("lastVisit")) {
+                    lastVisit = cookie.getValue();
+                } else if (name.equals("errors")) {
+                    errors = Integer.parseInt(cookie.getValue());
+                } else if (name.equals("numTextActions")) {
+                    actions = Integer.parseInt(cookie.getValue());
                 }
             }
             
@@ -67,7 +77,7 @@ public class StatsServlet extends HttpServlet {
             
             out.println(String.format("<p><strong>Last visit: </strong>%s</p>", lastVisit));
             out.println(String.format("<p><strong>Number of errors: </strong>%d</p>", errors));
-            out.println(String.format("<p><strong>Number of texts encoded/decoded: </strong>%d</p>", actions));
+            out.println(String.format("<p><strong>Times cipher used: </strong>%d</p>", actions));
             
             out.println("</body>");
             out.println("</html>");
